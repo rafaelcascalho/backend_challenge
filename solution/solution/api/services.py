@@ -2,11 +2,6 @@ from solution.api.models import Car, Tyre
 import solution.api.constants as constants
 
 class CarService():
-    # TODO: test
-    def create(self):
-        car = Car.objects.create()
-        return car
-
     def refuel(self, car, gas):
         if car.gas > constants.LOW_GAS:
             raise Exception('NoNeedForRefuel')
