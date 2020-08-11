@@ -1,10 +1,12 @@
-from solution.api.models import Car, Tyre
-import solution.api.constants as constants
 import math
+import solution.api.constants as constants
+from solution.api.models import Car, Tyre
+from solution.api.helpers import degradate_tyres, find_older_tyre
 
 
 class CarService():
     def refuel(self, car, gas):
+        print(car.gas)
         if car.gas > constants.LOW_GAS:
             raise Exception('NoNeedForRefuel')
 
@@ -50,19 +52,13 @@ class CarService():
             raise Exception('NotEnoughGas')
 
         tyres = Tyre.objects.filter(car_id=car_id)
-        older_tyre = min(tyres, key=lambda tyre: tyre.degradation)
+        older_tyre = find_older_tyre(tyres)
         older_tyre_endurance = constants.TYRE_MAX_ENDURANCE - older_tyre.degradation
         trip_degradation = distance * constants.TYRE_DEGRADATION_PER_KM
         if older_tyre_endurance < trip_degradation:
             raise Exception('TyreTore')
 
-        self.degradate_tyres(tyres, trip_degradation)
+        degradate_tyres(tyres, trip_degradation)
         car.gas -= required_gas
         car.save()
         return car
-
-
-    def degradate_tyres(self, tyres, trip_degradation):
-        for tyre in tyres:
-            tyre.degradation += trip_degradation
-            tyre.save()

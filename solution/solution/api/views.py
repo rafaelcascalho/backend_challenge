@@ -20,7 +20,7 @@ class CarViewSet(viewsets.ModelViewSet):
             id, gas = kwargs['pk'], request.data['gas']
             car = Car.objects.get(id=id)
             gas = self.car_service.refuel(car, gas)
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+            return Response(data={ 'gas': gas }, status=status.HTTP_200_OK)
         except Exception as exception:
             print(exception)
             if exception.args[0] == 'NoNeedForRefuel':
@@ -48,7 +48,7 @@ class CarViewSet(viewsets.ModelViewSet):
             return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-    @action(methods=['post'], detail=True, url_path='maintenance')
+    @action(methods=['put'], detail=True, url_path='maintenance')
     def replace(self, request, *args, **kwargs):
         try:
             car_id, tyre_id = kwargs['pk'], request.data['tyre_id']

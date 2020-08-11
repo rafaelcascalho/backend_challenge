@@ -4,7 +4,7 @@ from random import randint
 
 class Car(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    gas_capacity = models.FloatField(default=randint(50, 100))
+    gas_capacity = models.FloatField(default=100)
     gas = models.FloatField(default=100)
 
 
