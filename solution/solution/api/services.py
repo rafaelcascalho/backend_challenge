@@ -1,5 +1,7 @@
 from solution.api.models import Car, Tyre
 import solution.api.constants as constants
+import math
+
 
 class CarService():
     def refuel(self, car, gas):
@@ -41,6 +43,26 @@ class CarService():
         return tyre
 
 
-    # TODO: test
-    def trip(self):
-        pass
+    def trip(self, car_id, distance):
+        car = Car.objects.get(id=car_id)
+        required_gas = distance / constants.KM_PER_LITER
+        if required_gas > car.gas:
+            raise Exception('NotEnoughGas')
+
+        tyres = Tyre.objects.filter(car_id=car_id)
+        older_tyre = min(tyres, key=lambda tyre: tyre.degradation)
+        older_tyre_endurance = constants.TYRE_MAX_ENDURANCE - older_tyre.degradation
+        trip_degradation = distance * constants.TYRE_DEGRADATION_PER_KM
+        if older_tyre_endurance < trip_degradation:
+            raise Exception('TyreTore')
+
+        self.degradate_tyres(tyres, trip_degradation)
+        car.gas -= required_gas
+        car.save()
+        return car
+
+
+    def degradate_tyres(self, tyres, trip_degradation):
+        for tyre in tyres:
+            tyre.degradation += trip_degradation
+            tyre.save()

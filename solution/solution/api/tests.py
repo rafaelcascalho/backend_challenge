@@ -8,8 +8,8 @@ from solution.api.serializers import CarSerializer, TyreSerializer
 
 client = Client()
 
-class CreateCar(TestCase):
-    """ Test car creation """
+class LongTrip(TestCase):
+    """ Test 10.000 KM trip """
     def setup(self):
         [Car.objects.create() for _ in range(3)]
 
