@@ -19,7 +19,7 @@ class CarViewSet(viewsets.ModelViewSet):
             id, gas = kwargs['pk'], request.data['gas']
             car = Car.objects.get(id=id)
             gas = self.car_service.refuel(car, gas)
-            return Response(data={ 'gas': request.data['gas'] }, status=status.HTTP_201_CREATED)
+            return Response(data={ 'gas': gas }, status=status.HTTP_201_CREATED)
         except Exception as exception:
             print(exception)
             if exception.args[0] == 'NoNeedForRefuel':
@@ -28,17 +28,17 @@ class CarViewSet(viewsets.ModelViewSet):
                 return Response(data={ 'error': 'too much gas for the tank' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             return Response(data={ 'error' : 'Server Internal Error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    @action(methods=['put'], detail=True, url_path='edit')
+    @action(methods=['post'], detail=True, url_path='tyres/create')
     def create_tyre(self, request, *args, **kwargs):
         try:
-            id, gas = request.data['id'], request.data['gas']
-            car = Car.objects.get(id=id)
-            gas = self.car_service.refuel(car, gas)
-            return Response(data={ 'gas': gas }, status=status.HTTP_201_CREATED)
+            id = kwargs['pk']
+            if not Car.objects.get(id=id):
+                raise Exception('NotFound')
+            tyre = self.car_service.create_tyre(id)
+            serializer = TyreSerializer(tyre)
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         except Exception as exception:
             print(exception)
-            if exception.args[0] == 'NoNeedForRefuel':
-                return Response(data={ 'error': 'car has more than 5% gas' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-            elif exception.args[0] == 'GasOverflow':
-                return Response(data={ 'error': 'too much gas for the tank' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            if exception.args[0] == 'MaxTyres':
+                return Response(data={ 'error': 'car already have 4 tyres in good state' }, status=status.HTTP_400_BAD_REQUEST)
             return Response(data={ 'error' : 'Server Internal Error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

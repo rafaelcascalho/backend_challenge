@@ -21,16 +21,11 @@ class CarService():
         car.tyres.append(new_tyre)
         return car
 
-    # TODO: test
     def create_tyre(self, car_id):
-        car = Car.objects.get(id=car_id)
-        if not car:
-            raise Exception('NotFound')
-        if len(car.tyres) == 4:
+        tyres = Tyre.objects.filter(car_id=car_id)
+        if len(tyres) == 4:
             raise Exception('MaxTyres')
         tyre = Tyre.objects.create(car_id=car_id)
-        car.tyres.append(tyre)
-        car.save()
         return tyre
 
     # TODO: test

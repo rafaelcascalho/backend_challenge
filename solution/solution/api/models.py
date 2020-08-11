@@ -14,4 +14,4 @@ class Tyre(models.Model):
     car = models.ForeignKey(Car, related_name='tyres', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.degradation
+        return str(self.degradation)
