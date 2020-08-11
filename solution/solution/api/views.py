@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from .serializers import CarSerializer, TyreSerializer
 from .services import CarService
+from .errors import EXCEPTIONS
 
 
 class CarViewSet(viewsets.ModelViewSet):
@@ -22,12 +23,12 @@ class CarViewSet(viewsets.ModelViewSet):
             gas = self.car_service.refuel(car, gas)
             return Response(data={ 'gas': gas }, status=status.HTTP_200_OK)
         except Exception as exception:
-            print(exception)
-            if exception.args[0] == 'NoNeedForRefuel':
-                return Response(data={ 'error': 'car has more than 5% gas' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-            elif exception.args[0] == 'GasOverflow':
-                return Response(data={ 'error': 'too much gas for the tank' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-            return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            exception_name = exception.args[0]
+            if exception_name not in EXCEPTIONS:
+                exception_name = 'default'
+            exception = EXCEPTIONS[exception_name]
+            return Response(data=exception['data'], status=exception['status'])
+
 
 
     @action(methods=['post'], detail=True, url_path='tyres/create')
@@ -40,12 +41,12 @@ class CarViewSet(viewsets.ModelViewSet):
             serializer = TyreSerializer(tyre)
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         except Exception as exception:
-            print(exception)
-            if exception.args[0] == 'NotFound':
-                return Response(data={ 'error': 'car not found' }, status=status.HTTP_404_NOT_FOUND)
-            if exception.args[0] == 'MaxTyres':
-                return Response(data={ 'error': 'car already have 4 tyres in good state' }, status=status.HTTP_400_BAD_REQUEST)
-            return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            exception_name = exception.args[0]
+            if exception_name not in EXCEPTIONS:
+                exception_name = 'default'
+            exception = EXCEPTIONS[exception_name]
+            return Response(data=exception['data'], status=exception['status'])
+
 
 
     @action(methods=['put'], detail=True, url_path='maintenance')
@@ -58,14 +59,12 @@ class CarViewSet(viewsets.ModelViewSet):
             serializer = CarSerializer(car)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         except Exception as exception:
-            print(exception)
-            if exception.args[0] == 'NotFound':
-                return Response(data={ 'error': 'car not found' }, status=status.HTTP_404_NOT_FOUND)
-            elif exception.args[0] == 'TyreNotFoundInCar':
-                return Response(data={ 'error': 'tyre not found in car' }, status=status.HTTP_404_NOT_FOUND)
-            elif exception.args[0] == 'NoNeedForReplacement':
-                return Response(data={ 'error': 'tyre is still in good state' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-            return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            exception_name = exception.args[0]
+            if exception_name not in EXCEPTIONS:
+                exception_name = 'default'
+            exception = EXCEPTIONS[exception_name]
+            return Response(data=exception['data'], status=exception['status'])
+
 
 
     @action(methods=['post'], detail=True, url_path='trip')
@@ -79,11 +78,10 @@ class CarViewSet(viewsets.ModelViewSet):
             serializer = CarSerializer(car)
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         except Exception as exception:
-            print(exception)
-            if exception.args[0] == 'NotFound':
-                return Response(data={ 'error': 'car not found' }, status=status.HTTP_404_NOT_FOUND)
-            elif exception.args[0] == 'TyreTore':
-                return Response(data={ 'error': 'a tyre tore' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-            elif exception.args[0] == 'NotEnoughGas':
-                return Response(data={ 'error': 'not enough gas' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-            return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            exception_name = exception.args[0]
+            if exception_name not in EXCEPTIONS:
+                exception_name = 'default'
+            exception = EXCEPTIONS[exception_name]
+            return Response(data=exception['data'], status=exception['status'])
+
+

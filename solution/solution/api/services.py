@@ -6,7 +6,6 @@ from solution.api.helpers import degradate_tyres, find_older_tyre
 
 class CarService():
     def refuel(self, car, gas):
-        print(car.gas)
         if car.gas > constants.LOW_GAS:
             raise Exception('NoNeedForRefuel')
 
