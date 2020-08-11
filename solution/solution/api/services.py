@@ -7,7 +7,6 @@ class CarService():
         car = Car.objects.create()
         return car
 
-    # TODO: test
     def refuel(self, car, gas):
         if car.gas > constants.LOW_GAS:
             raise Exception('NoNeedForRefuel')
