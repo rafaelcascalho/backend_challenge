@@ -44,3 +44,22 @@ class CarViewSet(viewsets.ModelViewSet):
             if exception.args[0] == 'MaxTyres':
                 return Response(data={ 'error': 'car already have 4 tyres in good state' }, status=status.HTTP_400_BAD_REQUEST)
             return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(methods=['post'], detail=True, url_path='maintenance')
+    def replace(self, request, *args, **kwargs):
+        try:
+            car_id, tyre_id = kwargs['pk'], request.data['tyre_id']
+            if not Car.objects.get(id=car_id):
+                raise Exception('NotFound')
+            car = self.car_service.replace(car_id, tyre_id)
+            serializer = CarSerializer(car)
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as exception:
+            print(exception)
+            if exception.args[0] == 'NotFound':
+                return Response(data={ 'error': 'car not found' }, status=status.HTTP_404_NOT_FOUND)
+            elif exception.args[0] == 'TyreNotFoundInCar':
+                return Response(data={ 'error': 'tyre not found in car' }, status=status.HTTP_404_NOT_FOUND)
+            elif exception.args[0] == 'NoNeedForReplacement':
+                return Response(data={ 'error': 'tyre is still in good state' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
