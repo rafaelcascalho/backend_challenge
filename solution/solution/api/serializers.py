@@ -12,6 +12,7 @@ class TyreSerializer(FlexFieldsModelSerializer):
 class CarSerializer(FlexFieldsModelSerializer):
     tyres = TyreSerializer(many=True, required=False)
 
+
     class Meta:
         model = Car
         fields = ['id', 'gas_capacity', 'gas', 'tyres']

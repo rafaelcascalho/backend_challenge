@@ -14,6 +14,7 @@ class CarService():
         car.save()
         return new_quantity
 
+
     def replace(self, car_id, tyre_id):
         tyres = Tyre.objects.filter(car_id=car_id)
         search = [tyre for tyre in tyres if tyre.id == tyre_id]
@@ -28,13 +29,17 @@ class CarService():
         tyre = Tyre.objects.create(car_id=car_id)
         return Car.objects.get(id=car_id)
 
+
     def create_tyre(self, car_id):
         tyres = Tyre.objects.filter(car_id=car_id)
-        if len(tyres) == 4:
-            raise Exception('MaxTyres')
+        degradated = [tyre for tyre in tyres if tyre.degradation > constants.MIN_DEGRATATION]
+        tyres_number = len(tyres)
+        if tyres_number - len(degradated) == constants.MAX_TYRES:
+            raise Exception('MaxTyres')            
 
         tyre = Tyre.objects.create(car_id=car_id)
         return tyre
+
 
     # TODO: test
     def trip(self):

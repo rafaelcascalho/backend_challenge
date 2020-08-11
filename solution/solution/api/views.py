@@ -13,6 +13,7 @@ class CarViewSet(viewsets.ModelViewSet):
     serializer_class = CarSerializer
     car_service = CarService()
 
+
     @action(methods=['put'], detail=True, url_path='refuel')
     def refuel(self, request, *args, **kwargs):
         try:
@@ -27,6 +28,7 @@ class CarViewSet(viewsets.ModelViewSet):
             elif exception.args[0] == 'GasOverflow':
                 return Response(data={ 'error': 'too much gas for the tank' }, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
             return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     @action(methods=['post'], detail=True, url_path='tyres/create')
     def create_tyre(self, request, *args, **kwargs):
@@ -44,6 +46,7 @@ class CarViewSet(viewsets.ModelViewSet):
             if exception.args[0] == 'MaxTyres':
                 return Response(data={ 'error': 'car already have 4 tyres in good state' }, status=status.HTTP_400_BAD_REQUEST)
             return Response(data={ 'error' : 'server internal error' }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     @action(methods=['post'], detail=True, url_path='maintenance')
     def replace(self, request, *args, **kwargs):
